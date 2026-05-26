@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math or Myth?!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #460478;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            text-align: center;
+            background: #333842;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.795);
+            width: 350px;
+            border: 3px solid #e41271
+        }
+
+        #equation {
+            font-size: 3rem;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #f609a7;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .truth-btn { background-color: #78e927; color: #282c34;
+        box-shadow: 0 4px 0 #191a19; }
+        .myth-btn { background-color: #fb2d3f; color: white;
+        box-shadow: 0 4px 0 #1a1a1a; }
+         .truth-btn:hover { background-color: #aeef89; box-shadow: 0 4px 0 #070707; }
+         .myth-btn:hover { background-color: #db747d; box-shadow: 0 4px 0 #0a0a0a; }
+        #score-board {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #0fe7c6;
+        }
+
+        #timer-bar {
+            width: 100%;
+              height: 100%;
+            background-color: #04f7ebb8;
+            transition: width 8s linear;
+        }
+
+        #timer-container {
+            width: 100%;
+            height: 10px;
+            background-color: #4b5263;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #00bfffd1;
+        }
+        body h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #08eaff;
+            font-size: 34px;
+        }
+    </style>
+</head>
+<body>
+    <h2>"Summon your brainpower 🧠"</h2>
+
+    <div id="game-container">
+        <h1>Math or Myth</h1>
+        <div id="score-board">Score: <span id="score">0</span></div>
+        
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+
+        <div id="equation">Ready?</div>
+        
+        <div class="btn-container">
+            <button class="truth-btn" onclick="checkAnswer(true)">T R U T H</button>
+            <button class="myth-btn" onclick="checkAnswer(false)">M Y T H</button>
+        </div>
+        
+    </div>
+        <h2>Play by the numbers 🧠💥</h2>
+    <script>
+        let score = 0;
+        let currentCorrectAnswer = false;
+        let gameTimer;
+        const gameSpeed = 8000; // 8 seconds to answer
+
+        function generateEquation() {
+            // 1. Reset the visual timer bar instantly
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            
+            // Force a browser reflow so the transition reset registers
+            void timerBar.offsetWidth; 
+            
+            // Start the visual countdown animation
+            timerBar.style.transition = `width ${gameSpeed}ms linear`;
+            timerBar.style.width = '0%';
+
+            // 2. Generate random math
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const actualAnswer = num1 * num2;
+            
+            // 50% chance to show the true answer, 50% chance to show a lie
+            const isTruth = Math.random() > 0.5;
+            let displayedAnswer = actualAnswer;
+
+            if (!isTruth) {
+                // Generate a fake answer close to the real one
+                const modifier = Math.random() > 0.5 ? 1 : -1;
+                displayedAnswer = actualAnswer + modifier;
+            }
+
+            // Record if the displayed equation is actually true or false
+            currentCorrectAnswer = (displayedAnswer === actualAnswer);
+
+            // Display it on screen
+            document.getElementById('equation').innerText = `${num1} × ${num2} = ${displayedAnswer}`;
+
+            // 3. Set code timer. If it fires, player took too long!
+            clearTimeout(gameTimer);
+            gameTimer = setTimeout(() => {
+                gameOver("Time's up!");
+            }, gameSpeed);
+        }
+
+        function checkAnswer(playerChoseTruth) {
+            if (playerChoseTruth === currentCorrectAnswer) {
+                // Correct!
+                score++;
+                document.getElementById('score').innerText = score;
+                generateEquation();
+            } else {
+                // Wrong!
+                gameOver("Wrong answer!");
+            }
+        }
+
+        function gameOver(reason) {
+            clearTimeout(gameTimer);
+            alert(`${reason}\nGame Over! Your final score is: ${score}`);
+            score = 0;
+            document.getElementById('score').innerText = score;
+            generateEquation();
+        }
+
+        // Start the game on page load
+        generateEquation();
+    </script>
+</body>
+</html>
